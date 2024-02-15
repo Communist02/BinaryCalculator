@@ -1,0 +1,590 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0400
+header_name {.h}
+code_name {.cxx}
+decl {\#include <string>} {private global
+}
+
+decl {\#include <bitset>} {private global
+}
+
+decl {\#include <sstream>} {private global
+}
+
+decl {Fl_Button* ab[32];} {private global
+}
+
+decl {Fl_Button* bb[32];} {private global
+}
+
+decl {Fl_Button* cb[32];} {private global
+}
+
+decl {int32_t a = 0;} {private global
+}
+
+decl {int32_t b = 0;} {private global
+}
+
+decl {int32_t c = 0;} {private global
+}
+
+Function {pow(int32_t exponent)} {open private return_type {long long}
+} {
+  code {return (long long)1 << exponent;} {}
+}
+
+Function {intToDec(int32_t number)} {open private return_type {std::string}
+} {
+  code {return std::to_string(number);} {}
+}
+
+Function {intToBin(int32_t number)} {open private return_type {std::string}
+} {
+  code {if (number == 0) {
+  return "0";
+}
+std::string str = std::bitset<32>(number).to_string().c_str();
+size_t firstOnePos = str.find('1');
+if (firstOnePos == std::string::npos) {
+  return "0";
+}
+return str.substr(firstOnePos);} {}
+}
+
+Function {intToBinPlus(int32_t number)} {open private return_type {std::string}
+} {
+  code {return std::bitset<32>(number).to_string();} {}
+}
+
+Function {intToHex(int32_t number)} {open private return_type {std::string}
+} {
+  code {std::stringstream ss;
+ss << std::hex << number;
+return ss.str();} {}
+}
+
+Function {intToOct(int32_t number)} {open private return_type {std::string}
+} {
+  code {std::stringstream ss;
+ss << std::oct << number;
+return ss.str();} {}
+}
+
+Function {intToQuat(uint32_t number)} {open private return_type {std::string}
+} {
+  code {std::string quaternaryString;
+do {
+  int32_t remainder = number % 4;
+  char digit = '0' + remainder;
+  quaternaryString = digit + quaternaryString;
+  number /= 4;
+
+} while (number > 0);
+
+return quaternaryString;} {}
+}
+
+Function {hexToInt(const char* hex)} {open private return_type int32_t
+} {
+  code {int32_t num = 0, base = 1;
+    int32_t len = strlen(hex);
+    for (int i = len - 1; i >= 0; i--) {
+        if (hex[i] >= '0' && hex[i] <= '9') {
+            num += (hex[i] - '0') * base;
+        } else if (hex[i] >= 'A' && hex[i] <= 'F') {
+            num += (hex[i] - 'A' + 10) * base;
+        } else if (hex[i] >= 'a' && hex[i] <= 'f') {
+            num += (hex[i] - 'a' + 10) * base;
+        }
+        base *= 16;
+    }
+    return num;} {}
+}
+
+Function {octToInt(const char* oct)} {open private return_type int32_t
+} {
+  code {int32_t num = 0;
+int32_t base = 1;
+int len = strlen(oct);
+for (int i = len - 1; i >= 0; i--) {
+  int32_t digit = oct[i] - '0';
+  num += digit * base;
+  base *= 8;
+}
+return num;} {}
+}
+
+Function {quatToInt(const char* quat)} {open private return_type int32_t
+} {
+  code {int32_t num = 0;
+int32_t base = 1;
+int len = strlen(quat);
+for (int i = len - 1; i >= 0; i--) {
+  int32_t digit = quat[i] - '0';
+  num += digit * base;
+  base *= 4;
+}
+return num;} {}
+}
+
+Function {binToInt(const char* bin)} {open private return_type int32_t
+} {
+  code {std::string str = bin;
+int32_t result = 0;
+int32_t power = 0;
+for (int i = str.length() - 1; i >= 0; i--) {
+  if (bin[i] == '1') {
+    result += pow(power);
+  }
+  power++;
+}
+return result;} {}
+}
+
+Function {cb_button(Fl_Button* widget, void* data)} {open private return_type {static void}
+} {
+  code {if (widget->label() == "0") {
+  widget->label("1");
+} else {
+  widget->label("0");
+}
+
+a = 0;
+b = 0;
+c = 0;
+
+for (int i = 0; i < 32; i++) {
+  if (ab[i]->label() == "1") {
+    a += pow(31 - i); // Прибавить степень двойки
+  }
+  if (bb[i]->label() == "1") {
+    b += pow(31 - i); // Прибавить степень двойки
+  }
+  if (cb[i]->label() == "1") {
+    c += pow(31 - i); // Прибавить степень двойки
+  }
+}
+
+if (n->value() == 10) {
+  outputA->value(intToDec(a % pow(bits->value())).c_str());
+  outputB->value(intToDec(b % pow(bits->value())).c_str());
+  outputC->value(intToDec(c % pow(bits->value())).c_str());
+} else if (n->value() == 2) {
+  outputA->value(intToBin(a % pow(bits->value())).c_str());
+  outputB->value(intToBin(b % pow(bits->value())).c_str());
+  outputC->value(intToBin(c % pow(bits->value())).c_str());
+} else if (n->value() == 16) {
+  outputA->value(intToHex(a % pow(bits->value())).c_str());
+  outputB->value(intToHex(b % pow(bits->value())).c_str());
+  outputC->value(intToHex(c % pow(bits->value())).c_str());
+} else if (n->value() == 8) {
+  outputA->value(intToOct(a % pow(bits->value())).c_str());
+  outputB->value(intToOct(b % pow(bits->value())).c_str());
+  outputC->value(intToOct(c % pow(bits->value())).c_str());
+} else if (n->value() == 4) {
+  outputA->value(intToQuat(a % pow(bits->value())).c_str());
+  outputB->value(intToQuat(b % pow(bits->value())).c_str());
+  outputC->value(intToQuat(c % pow(bits->value())).c_str());
+}} {}
+}
+
+Function {resultOutput()} {open private
+} {
+  code {if (n->value() == 2) {
+  outputC->value(intToBin(c % pow(bits->value())).c_str());
+} else if (n->value() == 10) {
+  outputC->value(intToDec(c % pow(bits->value())).c_str());
+} else if (n->value() == 16) {
+  outputC->value(intToHex(c % pow(bits->value())).c_str());
+} else if (n->value() == 8) {
+  outputC->value(intToOct(c % pow(bits->value())).c_str());
+} else if (n->value() == 4) {
+  outputC->value(intToQuat(c % pow(bits->value())).c_str());
+}
+
+std::string str = intToBinPlus(c);
+
+for (int i = 0; i < 32; i++) {
+  if (str[i] == '1') {
+    cb[i]->label("1");
+  } else {
+    cb[i]->label("0");
+  }
+}} {}
+}
+
+Function {updateA()} {open private
+} {
+  code {std::string strA = intToBinPlus(a);
+
+for (int i = 0; i < 32; i++) {
+  if (strA[i] == '1') {
+    ab[i]->label("1");
+  } else {
+    ab[i]->label("0");
+  }
+}} {}
+}
+
+Function {updateB()} {open private
+} {
+  code {std::string strB = intToBinPlus(b);
+
+for (int i = 0; i < 32; i++) {
+  if (strB[i] == '1') {
+    bb[i]->label("1");
+  } else {
+    bb[i]->label("0");
+  }
+}} {}
+}
+
+Function {setColor(int num)} {open private
+} {
+  code {for (int i = 0; i < 32; i++) {
+    ab[i]->color(fl_rgb_color(230, 230, 230));
+    bb[i]->color(fl_rgb_color(230, 230, 230));
+    cb[i]->color(fl_rgb_color(230, 230, 230));
+}
+
+if (num == 4) {
+  for (int i = 0; i < 32; i += 4) {
+    ab[i]->color(fl_rgb_color(200, 200, 200));
+    bb[i]->color(fl_rgb_color(200, 200, 200));
+    cb[i]->color(fl_rgb_color(200, 200, 200));
+    ab[i + 1]->color(fl_rgb_color(200, 200, 200));
+    bb[i + 1]->color(fl_rgb_color(200, 200, 200));
+    cb[i + 1]->color(fl_rgb_color(200, 200, 200));
+  }
+}
+
+if (num == 8) {
+  for (int i = 2; i < 32; i += 6) {
+    for (int j = 0; j < 3; j++){
+      if (i + j == 32) break;
+      ab[i + j]->color(fl_rgb_color(200, 200, 200));
+      bb[i + j]->color(fl_rgb_color(200, 200, 200));
+      cb[i + j]->color(fl_rgb_color(200, 200, 200));
+    }
+  }
+}
+
+if (num == 16) {
+  for (int i = 0; i < 32; i += 8) {
+    for (int j = 0; j < 4; j++){
+      ab[i + j]->color(fl_rgb_color(200, 200, 200));
+      bb[i + j]->color(fl_rgb_color(200, 200, 200));
+      cb[i + j]->color(fl_rgb_color(200, 200, 200));
+    }
+  }
+}
+
+
+for (int i = 0; i < 32; i++) {
+  if (ab[i]->label() == "0") {
+    ab[i]->label("1");
+  } else {
+    ab[i]->label("0");
+  }
+  if (bb[i]->label() == "0") {
+    bb[i]->label("1");
+  } else {
+    bb[i]->label("0");
+  }
+  if (cb[i]->label() == "0") {
+    cb[i]->label("1");
+  } else {
+    cb[i]->label("0");
+  }
+
+}
+
+for (int i = 0; i < 32; i++) {
+  if (ab[i]->label() == "0") {
+    ab[i]->label("1");
+  } else {
+    ab[i]->label("0");
+  }
+  if (bb[i]->label() == "0") {
+    bb[i]->label("1");
+  } else {
+    bb[i]->label("0");
+  }
+  if (cb[i]->label() == "0") {
+    cb[i]->label("1");
+  } else {
+    cb[i]->label("0");
+  }
+
+}} {}
+}
+
+Function {window()} {open private
+} {
+  code {for (int i = 0; i < 32; i++) {
+  ab[i] = new Fl_Button(30 + i * 20, 30, 20, 20, "0");
+  bb[i] = new Fl_Button(30 + i * 20, 80, 20, 20, "0");
+  cb[i] = new Fl_Button(30 + i * 20, 130, 20, 20, "0");
+  ab[i]->callback((Fl_Callback *)cb_button);
+  bb[i]->callback((Fl_Callback *)cb_button);
+  cb[i]->callback((Fl_Callback *)cb_button);
+}} {}
+}
+
+Function {sym(std::string str, std::string symbols)} {open private return_type {std::string}
+} {
+  code {std::string result;
+for (int i = 0; i < str.length(); i++)
+{
+    if (symbols.find(str[i]) != std::string::npos)
+    {
+        result += str[i];
+    }
+}
+return result;} {}
+}
+
+Function {} {open
+} {
+  Fl_Window {} {
+    label {Mazur's Calculator} open
+    xywh {-32000 -32000 708 303} type Double hide
+    code0 {window();}
+  } {
+    Fl_Spinner n {
+      label {Система счисления:}
+      callback {if (n->value() == 7) {
+  n->value(4);
+} else if (n->value() == 9) {
+  n->value(8);
+} else if (n->value() == 13) {
+  n->value(10);
+} else if (n->value() == 15) {
+  n->value(16);
+} else if (n->value() == 21) {
+  n->value(2);
+} else if (n->value() == 11) {
+  n->value(10);
+} else if (n->value() == 5) {
+  n->value(8);
+} else if (n->value() == 3) {
+  n->value(4);
+} else if (n->value() == 22) {
+  n->value(16);
+} else if (n->value() == -1) {
+  n->value(2);
+}
+
+
+if (n->value() == 10) {
+  outputA->value(intToDec(a % pow(bits->value())).c_str());
+  outputB->value(intToDec(b % pow(bits->value())).c_str());
+  outputC->value(intToDec(c % pow(bits->value())).c_str());
+} else if (n->value() == 2) {
+  outputA->value(intToBin(a % pow(bits->value())).c_str());
+  outputB->value(intToBin(b % pow(bits->value())).c_str());
+  outputC->value(intToBin(c % pow(bits->value())).c_str());
+} else if (n->value() == 16) {
+  outputA->value(intToHex(a % pow(bits->value())).c_str());
+  outputB->value(intToHex(b % pow(bits->value())).c_str());
+  outputC->value(intToHex(c % pow(bits->value())).c_str());
+} else if (n->value() == 8) {
+  outputA->value(intToOct(a % pow(bits->value())).c_str());
+  outputB->value(intToOct(b % pow(bits->value())).c_str());
+  outputC->value(intToOct(c % pow(bits->value())).c_str());
+} else if (n->value() == 4) {
+  outputA->value(intToQuat(a % pow(bits->value())).c_str());
+  outputB->value(intToQuat(b % pow(bits->value())).c_str());
+  outputC->value(intToQuat(c % pow(bits->value())).c_str());
+}
+
+setColor(n->value());}
+      xywh {145 1 40 24} minimum -1 maximum 22 step 5 value 10
+    }
+    Fl_Spinner bits {
+      label {Разрядность:}
+      callback {if (n->value() == 10) {
+  outputA->value(intToDec(a % pow(bits->value())).c_str());
+  outputB->value(intToDec(b % pow(bits->value())).c_str());
+  outputC->value(intToDec(c % pow(bits->value())).c_str());
+} else if (n->value() == 2) {
+  outputA->value(intToBin(a % pow(bits->value())).c_str());
+  outputB->value(intToBin(b % pow(bits->value())).c_str());
+  outputC->value(intToBin(c % pow(bits->value())).c_str());
+} else if (n->value() == 16) {
+  outputA->value(intToHex(a % pow(bits->value())).c_str());
+  outputB->value(intToHex(b % pow(bits->value())).c_str());
+  outputC->value(intToHex(c % pow(bits->value())).c_str());
+} else if (n->value() == 8) {
+  outputA->value(intToOct(a % pow(bits->value())).c_str());
+  outputB->value(intToOct(b % pow(bits->value())).c_str());
+  outputC->value(intToOct(c % pow(bits->value())).c_str());
+} else if (n->value() == 4) {
+  outputA->value(intToQuat(a % pow(bits->value())).c_str());
+  outputB->value(intToQuat(b % pow(bits->value())).c_str());
+  outputC->value(intToQuat(c % pow(bits->value())).c_str());
+}
+
+for (int i = 0; i < 32 - bits->value(); i++) {
+  ab[i]->hide();
+  bb[i]->hide();
+  cb[i]->hide();
+}
+
+for (int i = 32 - bits->value(); i < 32; i++) {
+  ab[i]->show();
+  bb[i]->show();
+  cb[i]->show();
+}}
+      xywh {290 1 40 24} minimum 8 maximum 32 step 8 value 32
+    }
+    Fl_Input outputA {
+      label {A:}
+      callback {try {
+  if (n->value() == 10) {
+    outputA->value(sym(outputA->value(), "0123456789").c_str());
+    a = std::stoi(outputA->value());
+  } else if (n->value() == 16) {
+    outputA->value(sym(outputA->value(), "0123456789abcdefABCDEF").c_str());
+    a = hexToInt(outputA->value());
+  } else if (n->value() == 8) {
+    outputA->value(sym(outputA->value(), "01234567").c_str());
+    a = octToInt(outputA->value());
+  } else if (n->value() == 2) {
+    outputA->value(sym(outputA->value(), "01").c_str());
+    a = binToInt(outputA->value());
+  } else if (n->value() == 4) {
+    outputA->value(sym(outputA->value(), "0123").c_str());
+    a = quatToInt(outputA->value());
+  }
+}
+catch(...) {
+  a = 0;
+}
+c = 0;
+outputC->value(0);
+updateA();} selected
+      xywh {30 200 200 30} when 1
+    }
+    Fl_Input outputB {
+      label {B:}
+      callback {try {
+  if (n->value() == 10) {
+    outputB->value(sym(outputB->value(), "0123456789").c_str());
+    b = std::stoi(outputB->value());
+  } else if (n->value() == 16) {
+    outputB->value(sym(outputB->value(), "0123456789ABCDEFabcdef").c_str());
+    b = hexToInt(outputB->value());
+  } else if (n->value() == 8) {
+    outputB->value(sym(outputB->value(), "01234567").c_str());
+    b = octToInt(outputB->value());
+  } else if (n->value() == 2) {
+    outputB->value(sym(outputB->value(), "01").c_str());
+    b = binToInt(outputB->value());
+  } else if (n->value() == 4) {
+    outputB->value(sym(outputB->value(), "0123").c_str());
+    b = quatToInt(outputB->value());
+  }
+}
+catch(...) {
+  b = 0;
+}
+c = 0;
+outputC->value(0);
+updateB();}
+      xywh {255 200 200 30} when 1
+    }
+    Fl_Input outputC {
+      label {C:}
+      callback {outputC->value(sym(outputC->value(), "~").c_str());}
+      xywh {485 200 200 30} when 1
+    }
+    Fl_Box {} {
+      label A
+      xywh {0 30 30 17}
+    }
+    Fl_Box {} {
+      label B
+      xywh {0 80 30 16}
+    }
+    Fl_Box {} {
+      label C
+      xywh {0 130 30 16}
+    }
+    Fl_Button {} {
+      label {+}
+      callback {c = a + b;
+resultOutput();}
+      xywh {15 255 50 30}
+    }
+    Fl_Button {} {
+      label {-}
+      callback {c = a - b;
+resultOutput();}
+      xywh {70 255 50 30}
+    }
+    Fl_Button {} {
+      label {*}
+      callback {c = a * b;
+resultOutput();}
+      xywh {125 255 50 30}
+    }
+    Fl_Button {} {
+      label {/}
+      callback {if (b != 0) {
+  c = a / b;
+}
+resultOutput();}
+      xywh {180 255 50 30}
+    }
+    Fl_Button {} {
+      label {%}
+      callback {c = a % b;
+resultOutput();}
+      xywh {235 255 50 30}
+    }
+    Fl_Button {} {
+      label {<<}
+      callback {c = a << b;
+resultOutput();}
+      xywh {290 255 50 30}
+    }
+    Fl_Button {} {
+      label {>>}
+      callback {c = a >> b;
+resultOutput();}
+      xywh {345 255 50 30}
+    }
+    Fl_Button {} {
+      label {-A}
+      callback {c = -a;
+resultOutput();}
+      xywh {400 255 50 30}
+    }
+    Fl_Button {} {
+      label {-B}
+      callback {c = -b;
+resultOutput();}
+      xywh {455 255 50 30}
+    }
+    Fl_Button {} {
+      label {&}
+      callback {c = a & b;
+resultOutput();}
+      xywh {510 255 50 30}
+    }
+    Fl_Button {} {
+      label {|}
+      callback {c = a | b;
+resultOutput();}
+      xywh {565 255 50 30}
+    }
+    Fl_Button {} {
+      label {^}
+      callback {c = a ^ b;
+resultOutput();}
+      xywh {620 255 50 30}
+    }
+  }
+}
